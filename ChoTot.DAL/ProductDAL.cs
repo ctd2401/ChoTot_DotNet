@@ -74,10 +74,8 @@ namespace ChoTot.DAL
             }
             return Result;
         }
-        public JsonArray ViewProductDAL(int Page)
+        public JsonArray ViewProductDAL(PasePagingParams page)
         {
-            int ProductPerPage = Int32.Parse(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()["Settings:productperpage"]);
-            int startPage = ProductPerPage*(Page-1);
             JsonArray products = new JsonArray();
             Product item = null;
             try
@@ -86,14 +84,17 @@ namespace ChoTot.DAL
                 {
                     SQLCon = new SqlConnection(strCon);
                 }
-                SqlCommand cmd = new SqlCommand("Select_Product_By_Page");
+                SqlCommand cmd = new SqlCommand("Select_Product_By_Page", SQLCon);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Connection = SQLCon;
-                cmd.Parameters.AddWithValue("@productperpage", ProductPerPage);
-                cmd.Parameters.AddWithValue("@startpage", startPage);
+                cmd.Parameters.AddWithValue("@keyword", ("'%").ToString()+page.Keyword+("%'").ToString());
+                cmd.Parameters.AddWithValue("@productperpage", page.PageSize);
+                cmd.Parameters.AddWithValue("@order_by_name", page.OrderByName);
+                cmd.Parameters.AddWithValue("@order_by_option", page.OrderByOption);
+                cmd.Parameters.AddWithValue("@limit", page.Limit);
+                cmd.Parameters.AddWithValue("@offset", page.Offset);
                 SQLCon.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-
                 while (reader.Read())
                 {
                     item = new Product();
@@ -105,8 +106,7 @@ namespace ChoTot.DAL
                     var jsonString = JsonConvert.SerializeObject(item);
                     products.Add(jsonString);
                 }
-
-                reader.Close();
+                reader.Close();    
             }
             catch (Exception e)
             {

@@ -22,9 +22,9 @@ namespace ChoTot.Controllers
         }
         [HttpPost]
         [Route("ViewProduct")]
-        public IActionResult ViewProduct(int page)
+        public IActionResult ViewProduct(PasePagingParams page)
         {
-            if (page <= 0) return BadRequest();
+            if (page==null) return BadRequest();
             var Result = new ProductBUS().ViewProduct(page);
             if (Result != null) return Ok(Result);
             else return NotFound();

@@ -152,5 +152,59 @@ namespace ChoTot.DAL
             }
             return users;
         }
+        public BaseResultMOD ChangePasswordDAL(string oldpassword,string newpassword,string phonenumber)
+        {
+            BaseResultMOD Result = new BaseResultMOD();
+            try
+            {
+                if (SQLCon == null)
+                {
+                    SQLCon = new SqlConnection(strCon);
+                }
+                if (SQLCon.State == ConnectionState.Closed)
+                {
+                    SQLCon.Close();
+                }
+                SqlCommand cmd = new SqlCommand("Check_User_Exist", SQLCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Connection = SQLCon;
+                cmd.Parameters.AddWithValue("@phoneNumber", phonenumber);
+                SQLCon.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                string hashedPassword = "";
+                while (reader.Read())
+                {
+                    hashedPassword = reader.GetString(2);
+                }
+                reader.Close();
+                if (BCrypt.Net.BCrypt.Verify(oldpassword, hashedPassword))
+                {
+                    string passwordHash = BCrypt.Net.BCrypt.HashPassword(newpassword);
+                    SqlCommand cmd2 = new SqlCommand("Change_Password", SQLCon);
+                    cmd2.CommandType = CommandType.StoredProcedure;
+                    cmd2.Connection = SQLCon;
+                    cmd2.Parameters.AddWithValue("@phoneNumber", phonenumber);
+                    cmd2.Parameters.AddWithValue("@newpassword", passwordHash);
+                    cmd2.ExecuteNonQuery();
+                    if (cmd != null)
+                    {
+                        Result.Status = 1;
+                        Result.Message = "Change Password success!";
+                    }
+                }
+                else
+                {
+                    Result.Status = -1;
+                    Result.Message = "Old Password Wrong";
+                    return Result;
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            return Result;
+        }
+
     }
 }

@@ -22,7 +22,7 @@ namespace ChoTot.BUS
                 return new ProductDAL().AddProductDAL(item);
             return Result;
         }
-        public JsonArray ViewProduct(int page)
+        public JsonArray ViewProduct(PasePagingParams page)
         {
              return new ProductDAL().ViewProductDAL(page);
         }
