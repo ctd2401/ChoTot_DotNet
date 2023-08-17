@@ -22,7 +22,7 @@ namespace ChoTot.BUS
                 return new ProductDAL().AddProductDAL(item);
             return Result;
         }
-        public JsonArray ViewProduct(PasePagingParams page)
+        public BaseResultMOD ViewProduct(PasePagingParams page)
         {
              return new ProductDAL().ViewProductDAL(page);
         }
@@ -33,23 +33,6 @@ namespace ChoTot.BUS
         public BaseResultMOD UpdateProduct(string ProductCode,Product changevalue)
         {
             return new ProductDAL().UpdateProductDAL(ProductCode,changevalue);
-        }
-        public BaseResultMOD SearchProduct(string ProductCode)
-        {
-            var Result = new BaseResultMOD();
-            var SearchReturn = new ProductDAL().SearchProductDAL(ProductCode);
-            if (SearchReturn != null)
-            {
-                Result.Status = 1;
-                Result.Message = "Found Product";
-                Result.Data = SearchReturn;
-            }
-            else
-            {
-                Result.Status = -1;
-                Result.Message = "Product Not Found";
-            }
-            return Result;
         }
     }
 }
