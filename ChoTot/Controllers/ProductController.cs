@@ -47,14 +47,5 @@ namespace ChoTot.Controllers
             if (Result != null) return Ok(Result);
             else return NotFound();
         }
-        [HttpPost]
-        [Route("SearchProduct/{ProductCode}")]
-        public IActionResult SearchProduct(string ProductCode)
-        {
-            if (ProductCode == null) return BadRequest();
-            var Result = new ProductBUS().SearchProduct(ProductCode);
-            if (Result != null) return Ok(Result);
-            else return NotFound();
-        }
     }
 }

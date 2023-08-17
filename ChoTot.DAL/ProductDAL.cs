@@ -74,10 +74,10 @@ namespace ChoTot.DAL
             }
             return Result;
         }
-        public JsonArray ViewProductDAL(PasePagingParams page)
+        public BaseResultMOD ViewProductDAL(PasePagingParams page)
         {
-            JsonArray products = new JsonArray();
-            Product item = null;
+            var Result = new BaseResultMOD();
+            List<Product> productList = new List<Product>();
             try
             {
                 if (SQLCon == null)
@@ -97,22 +97,24 @@ namespace ChoTot.DAL
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    item = new Product();
+                    Product item = new Product();
                     item.ProductName = reader.GetString(1);
                     item.ProductCode = reader.GetString(2);
                     item.ProductDescription = reader.GetString(3);
                     item.ProductCategory = reader.GetString(4);
                     item.ProductPrice = Convert.ToSingle(reader[5]);
-                    var jsonString = JsonConvert.SerializeObject(item);
-                    products.Add(jsonString);
+                    productList.Add(item);
                 }
-                reader.Close();    
+                reader.Close();
+                Result.Status = 1;
+                Result.Data = productList;
+                Result.TotalRow = productList.Count;
             }
             catch (Exception e)
             {
                 throw;
             }
-            return products;
+            return Result;
         }
         public BaseResultMOD DeleteProductDAL(string ProductCode)
         {
@@ -185,38 +187,6 @@ namespace ChoTot.DAL
                 throw;
             }
             return Result;
-        }
-        public Product SearchProductDAL(string ProductCode)
-        {
-            Product item = null;
-            try
-            {
-                if (SQLCon == null)
-                {
-                    SQLCon = new SqlConnection(strCon);
-                }
-                //if(changevalue.)
-                SqlCommand cmd = new SqlCommand("Check_Product_Exist", SQLCon);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@productcode", ProductCode);
-                SQLCon.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    item = new Product();
-                    item.ProductName = reader.GetString(1);
-                    item.ProductCode = reader.GetString(2);
-                    item.ProductDescription = reader.GetString(3);
-                    item.ProductCategory = reader.GetString(4);
-                    item.ProductPrice = Convert.ToSingle(reader[5]);
-                }
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-            return item;
         }
     }
 }
